@@ -1,4 +1,4 @@
-package com.example.account_management
+package com.vaultblocks.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

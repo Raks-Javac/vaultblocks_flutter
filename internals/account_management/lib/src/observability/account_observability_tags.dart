@@ -1,6 +1,6 @@
 class AccountObservabilityTags {
   static const Map<String, Object?> getAccountsService = <String, Object?>{
-    'service': 'vaultblocks-example-mobile',
+    'service': 'vaultblocks_mobile',
     'package': 'account_management',
     'feature': 'get_accounts',
     'layer': 'service',
@@ -8,7 +8,7 @@ class AccountObservabilityTags {
   };
 
   static const Map<String, Object?> getAccountsRepository = <String, Object?>{
-    'service': 'vaultblocks-example-mobile',
+    'service': 'vaultblocks_mobile',
     'package': 'account_management',
     'feature': 'get_accounts',
     'layer': 'repository',
@@ -16,7 +16,7 @@ class AccountObservabilityTags {
   };
 
   static const Map<String, Object?> getAccountsDataSource = <String, Object?>{
-    'service': 'vaultblocks-example-mobile',
+    'service': 'vaultblocks_mobile',
     'package': 'account_management',
     'feature': 'get_accounts',
     'layer': 'api',
@@ -24,7 +24,7 @@ class AccountObservabilityTags {
   };
 
   static const Map<String, Object?> accountInquiryApi = <String, Object?>{
-    'service': 'vaultblocks-example-mobile',
+    'service': 'vaultblocks_mobile',
     'package': 'account_management',
     'feature': 'account_inquiry',
     'layer': 'api',
@@ -32,7 +32,7 @@ class AccountObservabilityTags {
   };
 
   static const Map<String, Object?> accountInquiryRepository = <String, Object?>{
-    'service': 'vaultblocks-example-mobile',
+    'service': 'vaultblocks_mobile',
     'package': 'account_management',
     'feature': 'account_inquiry',
     'layer': 'repository',
@@ -40,7 +40,7 @@ class AccountObservabilityTags {
   };
 
   static const Map<String, Object?> accountInquiryService = <String, Object?>{
-    'service': 'vaultblocks-example-mobile',
+    'service': 'vaultblocks_mobile',
     'package': 'account_management',
     'feature': 'account_inquiry',
     'layer': 'service',

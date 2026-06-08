@@ -1,5 +1,5 @@
 name: account_management
-description: Account domain package for the vaultblocks_flutter demo.
+description: Account domain package for the Vaultblocks Mobile app.
 publish_to: none
 version: 0.0.1
 

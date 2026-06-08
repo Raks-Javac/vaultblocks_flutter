@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vaultblocks_mobile/internals.dart';
-
+import 'package:internals/internals.dart';
 import '../../di/app_di.dart';
 import 'account_controller.dart';
 

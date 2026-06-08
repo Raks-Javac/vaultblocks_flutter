@@ -1,5 +1,3 @@
-library internals;
-
 export 'package:account_management/account_management.dart'
     show
         AccountFailure,
@@ -25,4 +23,3 @@ export 'package:core/core.dart'
         FakeApiClient,
         FakeAuthSession,
         ObservabilityService;
-

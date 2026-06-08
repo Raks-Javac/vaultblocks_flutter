@@ -1,0 +1,14 @@
+name: internals
+description: Barrel package that re-exports Vaultblocks internal dependencies.
+publish_to: none
+version: 0.0.1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  core:
+    path: core
+  account_management:
+    path: account_management
+

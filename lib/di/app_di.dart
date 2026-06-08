@@ -1,6 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:vaultblocks_mobile/internals.dart';
-
+import 'package:internals/internals.dart';
 import '../features/accounts/account_controller.dart';
 import '../features/transfer/transfer_inquiry_controller.dart';
 

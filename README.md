@@ -1,19 +1,42 @@
 # Vaultblocks Mobile
 
-Vaultblocks Mobile is an open-source Flutter banking architecture demo built as a Melos workspace. It shows how to keep the app thin while moving shared infrastructure and account logic into internal packages.
+Vaultblocks Mobile is a Flutter monorepo that keeps the app thin and pushes shared business logic into internal packages under `internals/`.
 
-The project uses fake data only. It does not depend on any real banking APIs.
+It is a fake-banking demo only. There are no real banking API calls.
 
-## What This Demonstrates
+## What Is In The Repo
 
-- A Flutter app at the repository root.
-- Internal packages grouped under `internals/`.
-- A shared `core` package for cross-cutting infrastructure.
-- An `account_management` package that owns the account domain.
-- Dependency injection with `get_it`.
-- A stable app barrel at `lib/internals.dart`.
-- Live account state with `ValueNotifier`.
-- Package-level tests and simple observability tags.
+- `lib/` contains the main Flutter app.
+- `internals/core` contains shared infrastructure like API abstractions, auth session fakes, result types, and observability helpers.
+- `internals/account_management` contains the account domain, repository, service layer, models, requests, responses, and tests.
+- `internals/lib/internals.dart` is the barrel that the app imports with `package:internals/internals.dart`.
+- `melos.yaml` defines workspace commands for setup, analysis, and tests.
+
+## Architecture
+
+The dependency flow is intentionally simple:
+
+```txt
+Vaultblocks Mobile app
+  -> internals/account_management
+  -> internals/core
+```
+
+The app does not import package internals directly from deep paths. It uses one stable barrel:
+
+```dart
+import 'package:internals/internals.dart';
+```
+
+That makes it easier to control what the app can see and to change internal package structure later without touching feature files.
+
+## Features
+
+- Accounts screen that loads fake account data.
+- Transfer inquiry screen that validates and returns fake inquiry results.
+- `get_it` dependency injection.
+- Live account state via `ValueNotifier`.
+- Package-level tests for the internal packages.
 
 ## Project Structure
 
@@ -22,53 +45,80 @@ vaultblocks_mobile/
   lib/
     main.dart
     di/
-      app_di.dart
     features/
-      accounts/
-        account_controller.dart
-        account_list_screen.dart
-      transfer/
-        transfer_inquiry_controller.dart
-        transfer_inquiry_screen.dart
-    internals.dart
   internals/
+    pubspec.yaml
+    lib/
+      internals.dart
     core/
-      lib/
-        core.dart
-        src/
     account_management/
-      lib/
-        account_management.dart
-        src/
-      test/
   melos.yaml
   pubspec.yaml
-  README.md
 ```
 
-## Architecture
+## Setup
 
-The dependency direction is intentionally simple:
+Run these from the repository root:
 
-```txt
-vaultblocks_mobile app
-  -> internals/account_management
-  -> internals/core
+```bash
+flutter pub get
+melos bootstrap
 ```
 
-The app imports a single barrel:
+What they do:
 
-```dart
-import 'package:vaultblocks_mobile/internals.dart';
+- `flutter pub get` fetches dependencies for the root app package.
+- `melos bootstrap` links the workspace packages together and fetches dependencies for every package in the monorepo.
+
+If you do not already have Melos installed:
+
+```bash
+dart pub global activate melos
 ```
 
-That barrel re-exports only the classes the app should see, so you can control the surface area from one place.
+## Common Commands
+
+### Analysis
+
+```bash
+flutter analyze
+melos run analyze
+melos run analyze:core
+melos run analyze:account
+```
+
+- `flutter analyze` checks the root Flutter app for analyzer issues.
+- `melos run analyze` runs `flutter analyze` across every package in the workspace.
+- `melos run analyze:core` checks only the `core` package.
+- `melos run analyze:account` checks only the `account_management` package.
+
+### Tests
+
+```bash
+flutter test
+melos run test
+melos run test:core
+melos run test:account
+melos run check:account
+```
+
+- `flutter test` runs tests for the root app package.
+- `melos run test` runs tests across all workspace packages.
+- `melos run test:core` runs tests only for `core`.
+- `melos run test:account` runs tests only for `account_management`.
+- `melos run check:account` runs both `analyze:account` and `test:account`.
+
+### Run The App
+
+```bash
+flutter run
+```
 
 ## Package Responsibilities
 
 ### `internals/core`
 
-`core` holds shared infrastructure only:
+`core` owns shared infrastructure only:
 
 - `ApiClient`
 - `FakeApiClient`
@@ -78,11 +128,6 @@ That barrel re-exports only the classes the app should see, so you can control t
 - `AppResult<T>`
 - `ObservabilityService`
 - `ConsoleObservabilityService`
-
-The fake API supports:
-
-- `GET /accounts`
-- `POST /accounts/inquiry`
 
 ### `internals/account_management`
 
@@ -97,149 +142,32 @@ The fake API supports:
 - `AccountStateStore`
 - `AccountObservabilityTags`
 
-This package updates live account state after a successful `getAccounts()` call.
+The account service updates live state after successful fetches, which the UI can listen to.
 
-## App Flow
+## Notes On The Barrel
 
-### Get Accounts
+`internals/lib/internals.dart` is the package entrypoint that Flutter resolves when you import `package:internals/internals.dart`. That file is the stable public surface for the app.
 
-The account screen calls:
+If you want to expose a new class to the app, export it there. If you want to hide something, simply do not export it.
 
-```dart
-accountManagementService.getAccounts();
-```
+## Working In `internals/`
 
-That flow is:
+The main app should stay as thin as possible. As a team rule, only change files under `internals/` when the app actually needs the change.
 
-```txt
-UI
-  -> AccountManagementService
-  -> AccountRepository
-  -> AccountRemoteDataSource
-  -> Core ApiClient / AuthSession / Observability
-  -> Fake backend response
-```
+Good reasons to edit `internals/`:
 
-The returned accounts are also written into `AccountStateStore`, which the UI listens to for live updates.
+- a new app feature needs shared logic,
+- a bug exists in shared package behavior,
+- the barrel needs to expose or hide a type,
+- package-level tests or analysis need to be updated.
 
-### Transfer Inquiry
+If the change only affects one app screen, prefer keeping it in `lib/` instead of pushing it into `internals/`.
 
-The transfer inquiry screen calls:
+## Running Tests Manually In A Package
 
-```dart
-accountManagementService.inquireAccount(
-  request: AccountInquiryRequest(
-    accountNumber: accountNumber,
-    bankCode: bankCode,
-  ),
-);
-```
-
-Valid input returns fake account details. Invalid input returns a controlled `AccountFailure`.
-
-## Why the Barrel Exists
-
-`lib/internals.dart` gives the app one stable import path for internal packages. That helps with:
-
-- avoiding import path churn,
-- limiting what app code can see,
-- making the dependency surface explicit,
-- gradually changing what is public without touching feature files.
-
-## Observability
-
-Each account layer emits package-specific tags through `ObservabilityService`. In this demo, `ConsoleObservabilityService` prints errors and tags to the console so it is easy to trace failures during development.
-
-## Running The Project
-
-### Prerequisites
-
-- Flutter SDK
-- Dart SDK
-- Melos
-
-### Setup
-
-Run these commands from the repository root:
-
-```bash
-flutter pub get
-dart pub global activate melos
-melos bootstrap
-```
-
-What each setup command does:
-
-- `flutter pub get` fetches the root app dependencies.
-- `dart pub global activate melos` installs Melos if you do not already have it.
-- `melos bootstrap` links the workspace packages together and fetches package dependencies for the monorepo.
-
-### Run The App
-
-```bash
-flutter run
-```
-
-### Run Tests
-
-Run the account package tests:
+You can also enter a package and run its own Flutter commands directly:
 
 ```bash
 cd internals/account_management
 flutter test
 ```
-
-Or run the workspace test script from the root:
-
-```bash
-melos run test:account
-```
-
-What the test commands do:
-
-- `flutter test` runs tests inside the `account_management` package only.
-- `melos run test:account` runs the account package test script from the workspace root.
-
-### Run Analysis
-
-```bash
-flutter analyze
-melos run analyze
-melos run test
-melos run analyze:core
-melos run test:core
-melos run analyze:account
-melos run test:account
-melos run check:account
-```
-
-What the analysis and workspace commands do:
-
-- `flutter analyze` checks the root app for static analysis issues.
-- `melos run analyze` runs `flutter analyze` across every package in the workspace.
-- `melos run test` runs `flutter test` across every package in the workspace.
-- `melos run analyze:core` runs analysis only for `internals/core`.
-- `melos run test:core` runs tests only for `internals/core`.
-- `melos run analyze:account` runs analysis only for `internals/account_management`.
-- `melos run test:account` runs tests only for `internals/account_management`.
-- `melos run check:account` runs both `analyze:account` and `test:account`.
-
-## Workspace Scripts
-
-Defined in `melos.yaml`:
-
-- `melos run bootstrap`
-- `melos run analyze`
-- `melos run test`
-- `melos run analyze:core`
-- `melos run test:core`
-- `melos run analyze:account`
-- `melos run test:account`
-- `melos run check:account`
-
-## Notes
-
-- The project uses fake data only.
-- `account_management` owns the account models and workflows.
-- The root app depends on the internal packages through path dependencies.
-- Generated files such as `.dart_tool/` and `pubspec.lock` are intentionally left out of version control.

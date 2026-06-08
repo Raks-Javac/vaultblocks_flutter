@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:vaultblocks_mobile/internals.dart';
+import 'package:internals/internals.dart';
 
 class TransferInquiryController extends ChangeNotifier {
   TransferInquiryController({

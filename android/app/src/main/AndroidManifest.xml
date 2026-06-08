@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="account_management"
+        android:label="vaultblocks_mobile"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

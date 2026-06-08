@@ -1,5 +1,3 @@
-library account_management;
-
 export 'src/data_sources/account_remote_data_source.dart';
 export 'src/data_sources/account_remote_data_source_impl.dart';
 export 'src/errors/account_failure.dart';
@@ -12,4 +10,3 @@ export 'src/responses/account_inquiry_response.dart';
 export 'src/services/account_management_service.dart';
 export 'src/services/account_management_service_impl.dart';
 export 'src/state/account_state_store.dart';
-

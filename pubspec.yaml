@@ -10,14 +10,13 @@ dependencies:
   flutter:
     sdk: flutter
   get_it: ^7.7.0
-  core:
-    path: internals/core
-  account_management:
-    path: internals/account_management
+  internals:
+    path: internals
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^5.0.0
   melos: ^6.3.2
 
 flutter:
