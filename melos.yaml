@@ -1,0 +1,32 @@
+name: vaultblocks_flutter
+
+packages:
+  - .
+  - internals/**
+
+scripts:
+  bootstrap:
+    run: melos bootstrap
+
+  analyze:
+    run: melos exec -- flutter analyze
+
+  test:
+    run: melos exec -- flutter test
+
+  analyze:core:
+    run: melos exec --scope="core" -- flutter analyze
+
+  test:core:
+    run: melos exec --scope="core" -- flutter test
+
+  analyze:account:
+    run: melos exec --scope="account_management" -- flutter analyze
+
+  test:account:
+    run: melos exec --scope="account_management" -- flutter test
+
+  check:account:
+    run: |
+      melos run analyze:account
+      melos run test:account
